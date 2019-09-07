@@ -17,14 +17,7 @@ local function Locals()
 	CDs = Player:CDs()
 end
 
-local function regularCast(spell, Unit)
-	if Spell[spell]:Cast(Unit) then
-        return true
-    end
-end
-
-function Paladin.Rotation()
-	Locals()
+local function Debugsettings()
 	-- Debug Settings
 	if not Player.Combat and Setting("Debug") then
 		if not prevs == nil then  
@@ -34,36 +27,123 @@ function Paladin.Rotation()
 			prev = nil
 		end
 	end	
-------- Pre COMBAT -------
-	-- Targeting 
-	if Player.Combat and not (Target and Target.ValidEnemy) and #Player:GetEnemies(5) >= 1 and Setting("AutoTarget") then
-		TargetUnit(DMW.Attackable[1].unit)
+end
+
+local function regularCast(spell, Unit)
+	if Spell[spell]:Cast(Unit) then
+        return true
+    end
+end
+
+local function Buffing()
+	if Setting("Use Devotion Aura") and not Buff.DevotionAura:Exist() then
+		regularCast("DevotionAura",Player)
 	end
-	-- Valid Enemy
-	if Target and Target.ValidEnemy and Target.Health > 1 then
-		-- Auto Attack Start
-		if not IsCurrentSpell(6603) and Target.Distance <= 5 then
-			StartAttack(Target.Pointer)
-		end
-	end --Target.ValidEnemy end
-------- COMBAT -------
-	if Target then
-		if Player.Combat and #Player:GetEnemies(5) >=1 and Target.Distance <= 8 then
-		--Seal of Righteousness
-		if not Buff.SealOfRight:Exist(Player) then
-			if regularCast("SealOfRight",Player) then
+
+	if Setting("Use Blessing of Might") then
+		if not Buff.BlessingMight:Exist(Player) then
+			if regularCast("BlessingMight", Player) then
 				return true
 			end
 		end
-		--HolyLight
-		if HP <= 40 and regularCast("HolyLight", Player) then
+	end
+	
+	if Setting ("Buff others") and not Player.Combat then
+		if #Player:GetFriends(30) >= 1 then
+			for _,Unit in ipairs(Player:GetFriends(30)) do
+				if not Buff.BlessingMight:Exist(Unit) then
+					if regularCast("BlessingMight",Unit) then
+						return true
+					end
+				end
+			end
+		end
+	end
+
+end
+
+local function Healing()
+	-- HolyLight out of Combat
+	if not Player.Combat and HP <= 75 then
+		if regularCast("HolyLight", Player) then
 			return true
 		end
 	end
-------- Post COMBAT -------
-		--HolyLight
-		if not Player.Combat and HP <= 40 and regularCast("HolyLight", Player) then
+	-- HolyLight in Combat
+	if Player.Combat and HP <= 50 then
+		if regularCast("HolyLight") then
 			return true
 		end
 	end
 end
+
+local function Targeting()
+	-- Targeting 
+	if Player.Combat and not (Target and Target.ValidEnemy) and #Player:GetEnemies(5) >= 1 and Setting("AutoTarget") then
+		TargetUnit(DMW.Attackable[1].unit)
+	end
+end
+
+local function StartAA()
+	if Target then
+		if not IsCurrentSpell(6603) and Target.Distance <= 5 then
+			StartAttack(Target.Pointer)
+		end
+	end
+end
+
+local function Combat ()
+	if Target then
+		if Target.ValidEnemy and Target.Health > 1 then
+			------- COMBAT -------
+			if Player.Combat and #Player:GetEnemies(5) >=1 and Target.Distance <= 10 then
+				--Seal of Righteousness
+				if Setting("Use Seal Of Righteousness") and not Buff.SealOfRight:Exist(Player) then
+					if regularCast("SealOfRight",Player) then
+						return true
+					end
+				end
+				--Seal of Command
+				if Setting("Use Seal Of Command") and not Buff.SealOfRight:Exist(Player) then
+					if regularCast("SealCommand",Player) then
+						return true
+					end
+				end
+				--Judgement
+				if Buff.SealOfRight:Exist(Player) and Spell.Judgement:CD() == 0 then
+					if regularCast("Judgement", Target) then
+						return true
+					end
+				end
+			end 
+		end
+	end
+end
+
+function Paladin.Rotation()
+	Locals()
+	--Check debug settings
+	if Debugsettings() then
+		return true
+	end
+	-- Check Buffs
+	if Buffing() then
+		return true
+	end
+	--Check targeting
+	if Targeting() then
+		return true
+	end
+	--Start AutoAttacking
+	if StartAA() then
+		return true
+	end
+	--Check for Self Healing
+	if Healing() then
+		return true
+	end
+	--Start Combat
+	if Combat() then 
+		return true
+	end
+end -- ROTATION
