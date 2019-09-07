@@ -1,7 +1,7 @@
 ## Interface: 11320
 ## Title: DoMeWhen Classic - Paladin
 ## Author: stefan2812
-## Notes: Paladin Rotation for DoMeWhen Classic
+## Notes: Paladin Rotation for DoMeWhen Classics
 ## DefaultState: Disabled
 ## Dependencies: DoMeWhen-Classic
 
