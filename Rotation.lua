@@ -16,6 +16,7 @@ local function Locals()
     HUD = DMW.Settings.profile.HUD
 	CDs = Player:CDs()
 end
+
 local might = {
 	["WARRIOR"] = true,
 	["PALADIN"] = true,
