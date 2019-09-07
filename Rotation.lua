@@ -48,18 +48,22 @@ local function Buffing()
 		end
 	end
 	
-	if Setting ("Buff others") and not Player.Combat then
-		if #Player:GetFriends(30) >= 1 then
-			for _,Unit in ipairs(Player:GetFriends(30)) do
-				if not Buff.BlessingMight:Exist(Unit) then
-					if regularCast("BlessingMight",Unit) then
-						return true
-					end
-				end
+	if Setting ("Buff others") and not Player.Combat and Target then
+		--if #Player:GetFriends(30) >= 1 then
+		--	for _,Unit in ipairs(Player:GetFriends(30)) do
+		--		if not Buff.BlessingMight:Exist(Unit) then
+		--			if regularCast("BlessingMight",Unit) then
+		--				return true
+		--			end
+		--		end
+		--	end
+		--end
+		if Target.Player and not Buff.BlessingMight:Exist(Target) then
+			if regularCast("BlessingMight",Target) then
+				return true
 			end
 		end
 	end
-
 end
 
 local function Healing()
@@ -85,7 +89,7 @@ local function Targeting()
 end
 
 local function StartAA()
-	if Target then
+	if Target and Target:IsEnemy() then
 		if not IsCurrentSpell(6603) and Target.Distance <= 5 then
 			StartAttack(Target.Pointer)
 		end
@@ -106,6 +110,12 @@ local function Combat ()
 				--Seal of Command
 				if Setting("Use Seal Of Command") and not Buff.SealOfRight:Exist(Player) then
 					if regularCast("SealCommand",Player) then
+						return true
+					end
+				end
+				--Seal of Crusader
+				if Setting("Use Seal Of Crusader") and not Buff.SealCrusader:Exist(Player) then
+					if regularCast("SealCrusader",Player) then
 						return true
 					end
 				end
