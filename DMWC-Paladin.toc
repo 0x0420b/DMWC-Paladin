@@ -1,0 +1,9 @@
+## Interface: 11320
+## Title: DoMeWhen Classic - Paladin
+## Author: stefan2812
+## Notes: Paladin Rotation for DoMeWhen Classic
+## DefaultState: Disabled
+## Dependencies: DoMeWhen-Classic
+
+Settings.lua
+Rotation.lua
