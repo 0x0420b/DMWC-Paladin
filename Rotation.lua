@@ -74,7 +74,7 @@ local function Buffing()
 	if Setting ("Buff others") and not Player.Combat and Player.HP >= 20 then
 		for _, Unit in pairs(DMW.Units) do
 			unitclass, unitclassid = select(2, UnitClass(Unit.Pointer))
-			if Unit.Distance <= 10 and Unit.Player and Unit.Name~=Player.Name then
+			if Unit.Distance <= 10 and Unit.Player and Unit.Name~=Player.Name and Unit.LoS then
 				if might[unitclass] and not Buff.BlessingMight:Exist(Unit) and Spell.BlessingMight:Known() then
 					if regularCast("BlessingMight",Unit) then
 						return true
@@ -143,7 +143,7 @@ local function Combat ()
 					end
 				end
 				--Judgement
-				if Buff.SealOfRight:Exist(Player) and Spell.Judgement:CD() == 0 then
+				if (Buff.SealOfRight:Exist(Player) or Buff.SealCrusader:Exist(Player) or Buff.SealCommand:Exist(Player)) and Spell.Judgement:CD() == 0 then
 					if regularCast("Judgement", Target) then
 						return true
 					end
