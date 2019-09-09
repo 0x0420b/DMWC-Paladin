@@ -43,28 +43,30 @@ local function Debugsettings()
 end
 
 local function regularCast(spell, Unit)
-	if Spell[spell]:Cast(Unit) then
-        return true
-    end
+	if Spell[spell]:Known() then
+		if Spell[spell]:Cast(Unit) then
+			return true
+		end
+	end
 end
 
 local function Buffing()
 	--Apply Aura
-	if Setting("Use Devotion Aura") and not Buff.DevotionAura:Exist() and Spell.DevotionAura:Known()then
+	if Setting("Use Devotion Aura") and not Buff.DevotionAura:Exist() then
 		regularCast("DevotionAura",Player)
 	end
-	if Setting("Use Retribution Aura") and not Buff.RetriAura:Exist() and Spell.RetriAura:Known()then
+	if Setting("Use Retribution Aura") and not Buff.RetriAura:Exist() then
 		regularCast("RetriAura",Player)
 	end
 	--Buff Self
-	if Setting("Use Blessing of Might") and Spell.BlessingMight:Known() then
+	if Setting("Use Blessing of Might") then
 		if not Buff.BlessingMight:Exist(Player) then
 			if regularCast("BlessingMight", Player) then
 				return true
 			end
 		end
 	end
-	if Setting("Use Blessing of Wisdom") and Spell.BlessingWissdom:Known() then
+	if Setting("Use Blessing of Wisdom") then
 		if not Buff.BlessingWissdom:Exist(Player) then
 			if regularCast("BlessingWissdom", Player) then
 				return true
@@ -73,14 +75,14 @@ local function Buffing()
 	end
 	--Buff Group Members
 	if Setting ("Buff others") and not Player.Combat and Player.HP >= 20 then
-		for _, Unit in pairs(DMW.Units) do
+		for _, Unit in ipairs(DMW.Units) do
 			unitclass, unitclassid = select(2, UnitClass(Unit.Pointer))
 			if Unit.Distance <= 10 and Unit.Player and Unit.Name~=Player.Name and Unit.LoS then
-				if might[unitclass] and not Buff.BlessingMight:Exist(Unit) and Spell.BlessingMight:Known() then
+				if might[unitclass] and not Buff.BlessingMight:Exist(Unit) then
 					if regularCast("BlessingMight",Unit) then
 						return true
 					end
-				elseif wisdom[unitclass] and not Buff.BlessingWissdom:Exist(Unit) and Spell.BlessingWissdom:Known() then
+				elseif wisdom[unitclass] and not Buff.BlessingWissdom:Exist(Unit)then
 					if regularCast("BlessingWissdom",Unit) then
 						return true
 					end
@@ -156,7 +158,7 @@ end
 
 local function Purify()
 	if Setting("Use Purify") and Spell.Purify:IsReady() then
-		for _, Unit in pairs(Player:GetFriends(35)) do
+		for _, Unit in ipairs(Player:GetFriends(40)) do
 			if Unit:Dispel(Spell.Purify) then
 				if regularCast("Purify",Player) then 
 					return true 
