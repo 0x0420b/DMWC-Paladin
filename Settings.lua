@@ -18,4 +18,7 @@ function Paladin.Settings()
 	UI.AddHeader("Auras")
 	UI.AddToggle("Use Devotion Aura", nil, false)	
 	UI.AddToggle("Use Retribution Aura", nil, false)
+	UI.AddHeader("Dispel")
+	UI.AddToggle("Use Purify", nil, false)
+	UI.AddToggle("Use Cleanse *not implemented yet*", nil, false)
 end

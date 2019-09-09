@@ -154,6 +154,18 @@ local function Combat ()
 	end
 end
 
+local function Purify()
+	if Setting("Use Purify") and Spell.Purify:IsReady() then
+		for _, Unit in pairs(Player:GetFriends(35)) do
+			if Unit:Dispel(Spell.Purify) then
+				if regularCast("Purify",Player) then 
+					return true 
+				end
+			end
+		end
+	end
+end
+
 function Paladin.Rotation()
 	Locals()
 	--Check debug settings
@@ -174,6 +186,10 @@ function Paladin.Rotation()
 	end
 	--Check for Self Healing
 	if Healing() then
+		return true
+	end
+	-- Dispel
+	if Purify() then
 		return true
 	end
 	--Start Combat
