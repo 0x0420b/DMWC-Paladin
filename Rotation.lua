@@ -101,7 +101,7 @@ local function Buffing()
 	end
 	--Buff Group Members
 	if Setting ("Buff others") and not Player.Combat and Player.HP >= 20 then
-		for _, Unit in ipairs(DMW.Units) do
+		for _, Unit in pairs(DMW.Units) do
 			unitclass, unitclassid = select(2, UnitClass(Unit.Pointer))
 			if Unit.Distance <= 10 and Unit.Player and Unit.Name~=Player.Name and Unit.LoS then
 				if Spell.BlessingofKingsG:Known() or Spell.BlessingKings:Known() then
